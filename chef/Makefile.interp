@@ -33,9 +33,9 @@ PYTHONBIN_PREFIX := $(realpath .)/python-bin
 VIRTUALENV := virtualenv-1.10.1
 SIMPLEJSON := simplejson-3.3.1
 
-VIRTUALENV_PKG := Jinja2 PyYAML unicodecsv webapp2 WebOb xlrd
+VIRTUALENV_PKG := 
 # TODO: Remove this?
-VIRTUALENV_PKG += coverage protobuf thrift
+#VIRTUALENV_PKG += coverage protobuf thrift
 
 .PHONY: all env clean
 
@@ -103,18 +103,18 @@ python-bin/bin/python: python-opt4-all/python
 $(VIRTUALENV).tar.gz:
 	wget --no-check-certificate https://pypi.python.org/packages/source/v/virtualenv/$(VIRTUALENV).tar.gz
 
-$(SIMPLEJSON).tar.gz:
-	wget --no-check-certificate https://pypi.python.org/packages/source/s/simplejson/$(SIMPLEJSON).tar.gz
+#$(SIMPLEJSON).tar.gz:
+#	wget --no-check-certificate https://pypi.python.org/packages/source/s/simplejson/$(SIMPLEJSON).tar.gz
 
 
 $(VIRTUALENV)/setup.py: $(VIRTUALENV).tar.gz
 	tar -xzvf $(VIRTUALENV).tar.gz
 	touch $@ # Without this, make doesn't seem to recognize the task as done
 
-$(SIMPLEJSON)/setup.py: $(SIMPLEJSON).tar.gz
-	tar -xzvf $(SIMPLEJSON).tar.gz
-	patch $(SIMPLEJSON)/setup.py <$(PYTHONCHEF)/simplejson.chef.patch
-	touch $@
+#$(SIMPLEJSON)/setup.py: $(SIMPLEJSON).tar.gz
+#	tar -xzvf $(SIMPLEJSON).tar.gz
+#	patch $(SIMPLEJSON)/setup.py <$(PYTHONCHEF)/simplejson.chef.patch
+#	touch $@
 
 env: stamps/virtualenv-configure
 
@@ -133,10 +133,12 @@ stamps/virtualenv-create: stamps/virtualenv-install
 	mkdir -p stamps && touch $@
 
 
-stamps/simplejson-install: stamps/virtualenv-create $(SIMPLEJSON)/setup.py
-	mkdir -p stamps && touch $@
-
-stamps/virtualenv-configure: stamps/virtualenv-create stamps/simplejson-install
-	python-env/bin/pip install $(VIRTUALENV_PKG)
-	cd $(SIMPLEJSON) && ../python-env/bin/python setup.py install
+#stamps/simplejson-install: stamps/virtualenv-create $(SIMPLEJSON)/setup.py
+#	mkdir -p stamps && touch $@
+#stamps/simplejson-install
+stamps/virtualenv-configure: stamps/virtualenv-create
+	python-env/bin/pip install -r $(PYTHONCHEF)/symtests/requirement_simplejson.txt
+	python-env/bin/pip install -r $(PYTHONCHEF)/symtests/requirement_other.txt --no-index --find-links=$(PYTHONCHEF)/packages
+	#python-env/bin/pip install $(VIRTUALENV_PKG)
+	#cd $(SIMPLEJSON) && ../python-env/bin/python setup.py install
 	mkdir -p stamps && touch $@
