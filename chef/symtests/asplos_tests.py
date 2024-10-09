@@ -39,6 +39,55 @@ from chef import light
 # TODO: Devise more meaningful defaults.
 # Idea: use a method to transform a concrete input into a wildcard of the same length.
 
+class SimpleTest(light.SymbolicTest):
+    def setUp(self):
+        pass
+    
+    def func1(self, input):
+        if input<50:
+            return 1
+        else:
+            return 0
+    
+    def func2(self,input):
+        if input<45:
+            return 1
+        else:
+            return 0
+
+    def runTest(self):
+        i=self.getInt("value",100,max_value=100,min_value=0)
+
+        # res=(self.func1(i)==self.func2(i))
+        res1=self.func1(i)
+        res2=self.func2(i)
+        self.assert(res1==res2)
+
+class HumanevalTest(light.SymbolicTest):
+    def setUp(self):
+        pass
+    def has_close_elements_A(numbers: List[int], threshold: int) -> bool:
+        for i in range(len(numbers)):
+            for j in range(i+1, len(numbers)):
+                if abs(numbers[i] - numbers[j]) < threshold:
+                    return True
+        return False
+
+    def has_close_elements_B(numbers: List[int], threshold: int) -> bool:
+        sorted_numbers = sorted(numbers)
+        for i in range(len(sorted_numbers) - 1):
+            if sorted_numbers[i + 1] - sorted_numbers[i] < threshold:
+                return True
+        return False
+    def runTest(self):
+        threshold=self.getInt("value",0)
+        numbers=self.getString("List",'\x00'*10)
+        resA=self.has_close_elements_A(numbers,threshold)
+        resB=self.has_close_elements_B(numbers,threshold)
+        # res=(self.has_close_elements_A(numbers,threshold)==self.has_close_elements_B(numbers,threshold))
+        self.assert(resA==resB)
+
+
 
 class ConfigParserTest(light.SymbolicTest):
     def setUp(self):

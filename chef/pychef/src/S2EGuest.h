@@ -42,6 +42,8 @@ public:
 	virtual void KillState(int status, const char *message);
 	virtual void MakeConcolic(void *buf, int size, const char *name);
 	virtual void MakeSymbolic(void *buf, int size, const char *name);
+	// supply
+	virtual void Assert(int expression);
 };
 
 }

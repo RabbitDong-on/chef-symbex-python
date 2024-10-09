@@ -273,6 +273,20 @@ symbex_assume(PyObject *self, PyObject *args) {
 
 	Py_RETURN_NONE;
 }
+/*----------------------------------------------------------------------------*/
+PyDoc_STRVAR(symbex_assert_doc,
+"assert(cond) \n\
+\n\
+assert that the condition passed as argument is true.");
+static PyObject *
+symbex_assert(PyObject *self,PyObject *args){
+	unsigned char condition;
+	if(!PyArg_ParseTuple(args,"b:assert",&condition)){
+		return NULL;
+	}
+	s2e_guest->Assert(condition);
+	Py_RETURN_NONE;
+}
 
 /*----------------------------------------------------------------------------*/
 
@@ -342,6 +356,9 @@ static PyMethodDef SymbexMethods[] = {
 
 	{ "assume", symbex_assume, METH_VARARGS, symbex_assume_doc },
 	{ "assumeascii", symbex_assumeascii, METH_VARARGS, symbex_assumeascii_doc },
+
+	// supply
+	{ "assert", symbex_assert, METH_VARARGS, symbex_assert_doc},
 
 #if 0
 	{ "decodetc", symbex_decodetc, METH_VARARGS, symbex_decodetc_doc },

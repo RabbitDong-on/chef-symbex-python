@@ -33,6 +33,10 @@ int S2EGuest::version() {
 void S2EGuest::Assume(int expression) {
 	s2e_assume(expression);
 }
+// supply
+void S2EGuest::Assert(int expression) {
+	s2e_assert(expression);
+}
 
 void S2EGuest::Concretize(void *buf, int size) {
 	s2e_concretize(buf, size);
@@ -58,5 +62,6 @@ void S2EGuest::MakeConcolic(void *buf, int size, const char *name) {
 void S2EGuest::MakeSymbolic(void *buf, int size, const char *name) {
 	s2e_make_symbolic(buf, size, name);
 }
+
 
 }

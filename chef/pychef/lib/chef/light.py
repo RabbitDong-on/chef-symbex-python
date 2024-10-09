@@ -74,7 +74,14 @@ class SymbolicTest(object):
             symbex.assumeascii(value)
 
         return value
-    
+    # supply
+    def killstate(self,status,messages):
+        symbex.killstate(status,messages)
+
+    # todo 
+    def assert(self,expression):
+        symbex.assert(expression)
+
     def concretize(self, value):
         if self.replay_assgn:
             return value
