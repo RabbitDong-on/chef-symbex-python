@@ -79,8 +79,8 @@ class SymbolicTest(object):
         symbex.killstate(status,messages)
 
     # todo 
-    def assert(self,expression):
-        symbex.assert(expression)
+    def Assert(self,expression):
+        symbex.Assert(expression)
 
     def concretize(self, value):
         if self.replay_assgn:

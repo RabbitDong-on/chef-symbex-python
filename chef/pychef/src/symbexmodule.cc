@@ -281,7 +281,7 @@ assert that the condition passed as argument is true.");
 static PyObject *
 symbex_assert(PyObject *self,PyObject *args){
 	unsigned char condition;
-	if(!PyArg_ParseTuple(args,"b:assert",&condition)){
+	if(!PyArg_ParseTuple(args,"b:Assert",&condition)){
 		return NULL;
 	}
 	s2e_guest->Assert(condition);
@@ -358,7 +358,7 @@ static PyMethodDef SymbexMethods[] = {
 	{ "assumeascii", symbex_assumeascii, METH_VARARGS, symbex_assumeascii_doc },
 
 	// supply
-	{ "assert", symbex_assert, METH_VARARGS, symbex_assert_doc},
+	{ "Assert", symbex_assert, METH_VARARGS, symbex_assert_doc},
 
 #if 0
 	{ "decodetc", symbex_decodetc, METH_VARARGS, symbex_decodetc_doc },

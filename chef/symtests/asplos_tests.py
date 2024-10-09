@@ -61,7 +61,7 @@ class SimpleTest(light.SymbolicTest):
         # res=(self.func1(i)==self.func2(i))
         res1=self.func1(i)
         res2=self.func2(i)
-        self.assert(res1==res2)
+        self.Assert(res1==res2)
 
 class HumanevalTest(light.SymbolicTest):
     def setUp(self):
@@ -85,7 +85,7 @@ class HumanevalTest(light.SymbolicTest):
         resA=self.has_close_elements_A(numbers,threshold)
         resB=self.has_close_elements_B(numbers,threshold)
         # res=(self.has_close_elements_A(numbers,threshold)==self.has_close_elements_B(numbers,threshold))
-        self.assert(resA==resB)
+        self.Assert(resA==resB)
 
 
 
