@@ -367,13 +367,24 @@ static PyMethodDef SymbexMethods[] = {
 };
 
 
+static struct PyModuleDef symbexmodule={
+	PyModuleDef_HEAD_INIT,
+	"symbex",
+	"Python interface for the symbex library functions",
+	-1,
+	SymbexMethods
+};
+
 PyMODINIT_FUNC
 initsymbex(void) {
-	PyObject *m;
+	// PyObject *m;
 
-	m = Py_InitModule3("symbex", SymbexMethods, module_doc);
+	// m = Py_InitModule3("symbex", SymbexMethods, module_doc);
+
+	PyObject *m=PyModule_Create(&symbexmodule);
+
 	if (m == NULL)
-	  return;
+	  return NULL;
 
 	if (s2e_guest == NULL) {
 		s2e_guest = new S2EGuest();
@@ -384,8 +395,9 @@ initsymbex(void) {
 	if (SymbexError == NULL) {
 		SymbexError = PyErr_NewException((char*)"symbex.SymbexError", NULL, NULL);
 		if (SymbexError == NULL)
-			return;
+			return NULL;
 	}
 	Py_INCREF(SymbexError);
 	PyModule_AddObject(m, "SymbexError", SymbexError);
+	return m;
 }

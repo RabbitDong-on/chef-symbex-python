@@ -182,8 +182,9 @@ PyObject *ConcolicSession::MakeConcolicInt(PyObject *target, const char *name,
 		return NULL;
 	}
 
-	PyIntObject *int_target = (PyIntObject*)target;
-	long value = int_target->ob_ival;
+	// PyIntObject *int_target = (PyIntObject*)target;
+	// long value = int_target->ob_ival;
+	long value = PyLong_AsLong(target);
 
 	if (max_value >= min_value && (value < min_value || value > max_value)) {
 		PyErr_SetString(PyExc_ValueError, "Incompatible value constraints");
@@ -196,7 +197,8 @@ PyObject *ConcolicSession::MakeConcolicInt(PyObject *target, const char *name,
 		s2e_guest_->Assume(value <= max_value);
 	}
 
-	return PyInt_FromLong(value);
+	// return PyInt_FromLong(value);
+	return PyLong_FromLong(value);
 }
 
 
@@ -215,7 +217,7 @@ PyObject *ConcolicSession::MakeConcolicSequence(PyObject *target, const char *na
 	if (target == Py_None) {
 		PyErr_SetString(PyExc_ValueError, "Cannot make symbolic None");
 		return NULL;
-	} else if (PyString_Check(target)) {
+	} else if (PyString_Check(target)) {//可以删除string这个类别
 		return MakeConcolicString(target, name, max_size, min_size);
 	} else if (PyUnicode_Check(target)) {
 		return MakeConcolicUnicode(target, name, max_size, min_size);
@@ -316,22 +318,24 @@ PyObject *ConcolicSession::MakeConcolicUnicode(PyObject *target,
 	assert(PyUnicode_Check(target));
 
 	PyUnicodeObject *uni_target = (PyUnicodeObject*)target;
-
-	if (CheckObjectSize(uni_target->length, max_size, min_size) < 0) {
+	if (CheckObjectSize(PyUnicode_GET_LENGTH(uni_target), max_size, min_size) < 0) {
+	// if (CheckObjectSize(uni_target->length, max_size, min_size) < 0) {
 		PyErr_SetString(PyExc_ValueError, "Incompatible size constraints");
 		return NULL;
 	}
 
-	Py_ssize_t buf_size = uni_target->length * sizeof(Py_UNICODE);
+	// Py_ssize_t buf_size = uni_target->length * sizeof(Py_UNICODE);
+	Py_ssize_t buf_size = PyUnicode_GET_LENGTH(uni_target) * sizeof(Py_UNICODE);
 
 	Py_UNICODE *uni_data = (Py_UNICODE *)PyMem_Malloc(buf_size);
 	if (!uni_data) {
 		return PyErr_NoMemory();
 	}
-	memcpy(uni_data, uni_target->str, buf_size);
+	// memcpy(uni_data, uni_target->str, buf_size);
+	memcpy(uni_data, PyUnicode_DATA(uni_target), buf_size);
 	MakeConcolicBuffer(uni_data, buf_size, name, "value", 'u');
 
-	PyObject *result = PyUnicode_FromUnicode(uni_data, uni_target->length);
+	PyObject *result = PyUnicode_FromUnicode(uni_data, PyUnicode_GET_LENGTH(uni_target));
 	if (result == NULL) {
 		PyMem_Free(uni_data);
 		return NULL;
@@ -339,9 +343,9 @@ PyObject *ConcolicSession::MakeConcolicUnicode(PyObject *target,
 
 	if (max_size >= 0) {
 		PyUnicodeObject *uni_result = (PyUnicodeObject*)result;
-		MakeConcolicBuffer(&uni_result->length, sizeof(uni_result->length),
+		MakeConcolicBuffer(&PyUnicode_GET_LENGTH(uni_result), sizeof(PyUnicode_GET_LENGTH(uni_result)),
 				name, "size", 'l');
-		ConstrainObjectSize(uni_result->length, max_size, min_size);
+		ConstrainObjectSize(PyUnicode_GET_LENGTH(uni_result), max_size, min_size);
 	}
 
 	PyMem_Free(uni_data);
@@ -354,15 +358,16 @@ PyObject *ConcolicSession::MakeConcolicList(PyObject *target,
 	assert(PyList_Check(target));
 
 	PyListObject *list_target = (PyListObject*)target;
-	if (CheckObjectSize(list_target->ob_size, max_size, min_size) < 0) {
+	// if (CheckObjectSize(list_target->ob_size, max_size, min_size) < 0) {
+	if (CheckObjectSize(PyList_GET_SIZE(list_target), max_size, min_size) < 0) {
 		PyErr_SetString(PyExc_ValueError, "Incompatible size constraints");
 		return NULL;
 	}
 
 	if (max_size >= 0) {
-		MakeConcolicBuffer(&list_target->ob_size, sizeof(list_target->ob_size),
+		MakeConcolicBuffer(&PyList_GET_SIZE(list_target), sizeof(PyList_GET_SIZE(list_target)),
 				name, "size", 'l');
-		ConstrainObjectSize(list_target->ob_size, max_size, min_size);
+		ConstrainObjectSize(PyList_GET_SIZE(list_target), max_size, min_size);
 	}
 
 	Py_INCREF(target);
@@ -390,10 +395,10 @@ PyObject *ConcolicSession::MakeConcolicTuple(PyObject *target,
 	assert(PyTuple_Check(target));
 
 	PyTupleObject *tup_target = (PyTupleObject*)target;
-	MakeConcolicBuffer(&tup_target->ob_size, sizeof(tup_target->ob_size),
-			name, "size", 'l');
-	s2e_guest_->Assume(tup_target->ob_size >= 0);
-	s2e_guest_->Assume(tup_target->ob_size < max_symbolic_size_);
+	// MakeConcolicBuffer(&tup_target->ob_size, sizeof(tup_target->ob_size), name, "size", 'l');
+	MakeConcolicBuffer(&PyTuple_GET_SIZE(tup_target), sizeof(PyTuple_GET_SIZE(tup_target)), name, "size", 'l');
+	s2e_guest_->Assume(PyTuple_GET_SIZE(tup_target) >= 0);
+	s2e_guest_->Assume(PyTuple_GET_SIZE(tup_target) < max_symbolic_size_);
 
 	Py_INCREF(target);
 	return target;
