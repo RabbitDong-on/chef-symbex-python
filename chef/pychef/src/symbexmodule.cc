@@ -376,7 +376,7 @@ static struct PyModuleDef symbexmodule={
 };
 
 PyMODINIT_FUNC
-initsymbex(void) {
+PyInit_symbex(void) {
 	// PyObject *m;
 
 	// m = Py_InitModule3("symbex", SymbexMethods, module_doc);
